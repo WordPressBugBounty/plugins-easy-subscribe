@@ -111,7 +111,7 @@ class Helper
 
             // Send confirmation email only if double opt-in is enabled and the user is not auto-confirmed
             if ($double_opt_in && $status === 'unconfirmed') {
-                Notifier::send_confirmation_email($email, $security_token, $origin_url);
+                Notifier::send_confirmation_email($email, $security_token, $origin_url, $form_id);
 
                 // TODO: check if email is sent.
                 $pending_confirmation = true;
@@ -452,30 +452,28 @@ class Helper
     public static function delete_old_data($older_than)
     {
 
-        if (!$older_than) {
-            return;
+        // Whitelisted: the unit is part of the SQL and cannot be a placeholder.
+        $intervals = [
+            '30_days'   => [30, 'DAY'],
+            '3_months'  => [3, 'MONTH'],
+            '6_months'  => [6, 'MONTH'],
+            '12_months' => [12, 'MONTH'],
+        ];
+
+        if (!isset($intervals[$older_than])) {
+            return 0;
         }
 
-        $date_interval  = "";
-        $interval_value = "";
-
-        // Extract the numeric value from the older_than using regex
-        preg_match('/(\d+)_\w+/', $older_than, $matches);
-
-        if (!empty($matches)) {
-            $interval_value = intval($matches[1]);
-            $date_interval  = preg_replace('/\d+_/', '', $older_than);
-            $date_interval  = rtrim($date_interval, 's');
-        }
+        [$interval_value, $date_interval] = $intervals[$older_than];
 
         global $wpdb;
 
         $table_name = self::get_table_name('esub');
 
-        $wpdb->get_results($wpdb->prepare(
-            "DELETE FROM {$table_name} WHERE date_created < DATE_SUB(NOW(), INTERVAL %d $date_interval)",
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$table_name} WHERE date_created < DATE_SUB(NOW(), INTERVAL %d {$date_interval})",
             $interval_value
-        ), ARRAY_A);
+        ));
 
         return $wpdb->rows_affected;
     }
@@ -507,13 +505,23 @@ class Helper
 
 
     /**
+     * Saved options, read when needed so translation plugins (WPML/Polylang, via
+     * wpml-config.xml) can filter visitor-facing texts for the current language.
+     * DEVNET_ESUB_OPTIONS is read before the language is known; keep it for structure only.
+     */
+    public static function options()
+    {
+        return function_exists('devnet_esub_options') ? devnet_esub_options() : DEVNET_ESUB_OPTIONS;
+    }
+
+    /**
      * Get option or default.
      *
      * @since     1.0.0
      */
     public static function get_option($name, $group)
     {
-        $options = DEVNET_ESUB_OPTIONS;
+        $options = self::options();
 
         $group_options = $options[$group] ?? [];
 
@@ -529,20 +537,7 @@ class Helper
      */
     public static function get_all_options()
     {
-        $saved_options = DEVNET_ESUB_OPTIONS;
-        $is_multilingual = $saved_options['general']['multilingual'] ?? false;
-
-        $multilingual_fields = [
-            'name_field_label',
-            'last_name_field_label',
-            'gdpr_text',
-            'email_field_label',
-            'button_label',
-            'content_before_form',
-            'success',
-            'exists',
-            'spam',
-        ];
+        $saved_options = self::options();
 
         $options = [];
 
@@ -555,10 +550,6 @@ class Helper
                     foreach ($group_defaults as $name => $value) {
                         $option_value = $form_options[$name] ?? $value;
 
-                        if ($is_multilingual && in_array($name, $multilingual_fields)) {
-                            $option_value = $value;
-                        }
-
                         $options[$group_name][$form_name][$name] = $option_value;
                     }
                 }
@@ -568,16 +559,30 @@ class Helper
                 foreach ($group_defaults as $name => $value) {
                     $option_value = $group_options[$name] ?? $value;
 
-                    if ($is_multilingual && in_array($name, $multilingual_fields)) {
-                        $option_value = $value;
-                    }
-
                     $options[$group_name][$name] = $option_value;
                 }
             }
         }
 
         $options = apply_filters('esub_all_options', $options);
+
+        // After the filter, so forms added by modules (e.g. the Product Form) follow the same rule.
+        $defaults     = Defaults::form() + Defaults::messages();
+        $use_defaults = function ($values) use ($defaults) {
+            foreach (Defaults::TEXT_FIELDS as $name) {
+                if (is_array($values) && ($values[$name] ?? null) === '') {
+                    $values[$name] = $defaults[$name];
+                }
+            }
+            return $values;
+        };
+
+        // Forms added by a filter can be raw saved options (the legacy WooCommerce add-on): fill in missing settings,
+        // or the frontend gets e.g. no colour and stops rendering.
+        $options['forms']    = array_map(function ($values) use ($use_defaults) {
+            return $use_defaults((is_array($values) ? $values : []) + Defaults::form());
+        }, $options['forms'] ?? []);
+        $options['messages'] = $use_defaults($options['messages'] ?? []);
 
         return $options;
     }

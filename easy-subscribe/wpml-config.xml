@@ -1,0 +1,38 @@
+<wpml-config>
+  <admin-texts>
+    <key name="devnet_esub_form">
+      <key name="content_before_form"/>
+      <key name="popup_intro"/>
+      <key name="popup_title"/>
+      <key name="popup_description"/>
+      <key name="name_field_label"/>
+      <key name="last_name_field_label"/>
+      <key name="email_field_label"/>
+      <key name="gdpr_text"/>
+      <key name="button_label"/>
+      <key name="success"/>
+      <key name="exists"/>
+      <key name="error"/>
+      <key name="spam"/>
+      <key name="pending_confirmation"/>
+      <key name="confirmation_url"/>
+    </key>
+    <key name="devnet_esub_form_*">
+      <key name="content_before_form"/>
+      <key name="popup_intro"/>
+      <key name="popup_title"/>
+      <key name="popup_description"/>
+      <key name="name_field_label"/>
+      <key name="last_name_field_label"/>
+      <key name="email_field_label"/>
+      <key name="gdpr_text"/>
+      <key name="button_label"/>
+      <key name="success"/>
+      <key name="exists"/>
+      <key name="error"/>
+      <key name="spam"/>
+      <key name="pending_confirmation"/>
+      <key name="confirmation_url"/>
+    </key>
+  </admin-texts>
+</wpml-config>

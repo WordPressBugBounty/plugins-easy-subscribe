@@ -47,15 +47,20 @@ class Settings
 
         // Calling it from here to avoid unnecessary code execution.
         add_action('devnet_esub_form_top', [$this, 'panel_description']);
+        add_action('devnet_esub_form_header', [$this, 'form_header']);
     }
 
     public function get_settings_sections()
     {
 
-        $sections[] = [
-            'id'    => 'devnet_esub_general',
-            'title' => esc_html__('General', 'easy-subscribe')
-        ];
+        $sections = [];
+
+        if (Options::general()) {
+            $sections[] = [
+                'id'    => 'devnet_esub_general',
+                'title' => esc_html__('General', 'easy-subscribe')
+            ];
+        }
 
         $form_counter = 1;
         $multiple_forms = count(DEVNET_ESUB_OPTIONS['forms']) > 1;
@@ -86,12 +91,18 @@ class Settings
             $form_counter++;
         }
 
-        $sections[] = [
-            'id'    => 'devnet_esub_messages',
-            'title' => esc_html__('Messages', 'easy-subscribe')
-        ];
+        $sections = apply_filters('esub_settings_sections', $sections);
 
-        return apply_filters('esub_settings_sections', $sections);
+        // Every form gets the Form / Style / Subscription / Popup layout, including forms added through
+        // the filter (e.g. the WooCommerce Product Form); other sections keep the plain table.
+        foreach ($sections as &$section) {
+            if (empty($section['tabs']) && preg_match('/^devnet_esub_form(_|$)/', $section['id'])) {
+                $section['layout'] = $section['layout'] ?? Options::form_layout();
+            }
+        }
+        unset($section);
+
+        return $sections;
     }
 
     /**
@@ -109,17 +120,35 @@ class Settings
             $settings_fields[$form_id] = Options::form();
         }
 
-        $settings_fields['devnet_esub_messages'] = Options::messages();
+        $settings_fields = apply_filters('esub_settings_fields', $settings_fields);
 
+        // Custom CSS is deprecated in favour of theme CSS (::part); only forms with saved CSS keep the editor.
+        foreach ($settings_fields as $section_id => &$fields) {
+            $saved = get_option($section_id);
 
-        return apply_filters('esub_settings_fields', $settings_fields);
+            if (strpos($section_id, 'devnet_esub_form') === 0 && trim((string) ($saved['custom_css'] ?? '')) === '') {
+                $fields = array_values(array_filter($fields, function ($field) {
+                    return !in_array($field['name'], ['custom_css', 'custom_css__disabled'], true);
+                }));
+            }
+        }
+        unset($fields);
+
+        return $settings_fields;
     }
 
     public function settings_page()
     {
         echo '<div class="easy-subscribe-wrap devnet-plugin-settings-page" data-id="devnet_esub">';
 
+        printf(
+            '<h1 class="esub-page-title"><span class="esub-page-mark dashicons dashicons-email-alt" aria-hidden="true"></span>%1$s <span class="esub-page-version">%2$s</span></h1>',
+            esc_html__('Easy Subscribe', 'easy-subscribe'),
+            esc_html(DEVNET_ESUB_VERSION)
+        );
+
         $this->settings_api->show_navigation();
+        echo '<hr class="wp-header-end">';
         $this->panel_description('all');
         $this->settings_api->show_forms();
 
@@ -172,18 +201,38 @@ class Settings
         }
 
         if (strpos($id, "devnet_esub_form") === 0) {
-            echo '<div class="esub-preview-button" data-id="' . esc_attr($id) . '">' . esc_html__('Preview Form', 'easy-subscribe') . '</div>';
-            echo '<div class="esub-preview-wrap">';
-            echo '<div class="esub-preview-bg-select">
-            <div class="esub-preview-bg-color-box" style="background-color: white"></div>
-            <div class="esub-preview-bg-color-box" style="background-color: darkgray"></div>
-            <div class="esub-preview-bg-color-box" style="background-color: black"></div>
-           </div>';
-            echo '<span class="esub-preview-close">&times</span>';
+            echo '<div class="esub-preview-wrap" id="esub-preview-wrap--' . esc_attr($id) . '">';
+            echo '<div class="esub-preview-bg-select">';
+            foreach (['white' => __('White background', 'easy-subscribe'), 'darkgray' => __('Gray background', 'easy-subscribe'), 'black' => __('Black background', 'easy-subscribe')] as $color => $label) {
+                echo '<button type="button" class="esub-preview-bg-color-box" style="background-color: ' . esc_attr($color) . '" aria-label="' . esc_attr($label) . '"></button>';
+            }
+            echo '</div>';
+            echo '<button type="button" class="esub-preview-close" aria-label="' . esc_attr__('Close preview', 'easy-subscribe') . '">&times;</button>';
             echo '<div id="preview--' . esc_attr($id) . '" class="esub-preview">';
             echo '<div class="esub-form"></div>';
             echo '</div>';
             echo '</div>';
         }
+    }
+
+    /**
+     * Form header utilities: disabled status, preview and shortcode.
+     */
+    public function form_header($form)
+    {
+        $id           = $form['id'];
+        $shortcode_id = Helper::extract_form_id($id);
+        $shortcode    = $shortcode_id === null ? '[easy-subscribe]' : '[easy-subscribe id="' . $shortcode_id . '"]';
+
+        // CSS shows the one matching the Enable switch.
+        echo '<span class="esub-form-status"><span class="esub-form-status__on">' . esc_html__('Enabled', 'easy-subscribe') . '</span><span class="esub-form-status__off">' . esc_html__('Disabled', 'easy-subscribe') . '</span></span>';
+        echo '<button type="button" class="button esub-preview-button" data-id="' . esc_attr($id) . '" aria-controls="esub-preview-wrap--' . esc_attr($id) . '" aria-expanded="false">' . esc_html__('Preview', 'easy-subscribe') . '</button>';
+
+        echo '<div class="esub-shortcode-field">';
+        echo '<label for="esub-shortcode--' . esc_attr($id) . '">' . esc_html__('Shortcode', 'easy-subscribe') . '</label>';
+        echo '<input type="text" id="esub-shortcode--' . esc_attr($id) . '" class="esub-shortcode" value="' . esc_attr($shortcode) . '" readonly>';
+        echo '<button type="button" class="button esub-copy-shortcode" aria-controls="esub-shortcode--' . esc_attr($id) . '">' . esc_html__('Copy', 'easy-subscribe') . '</button>';
+        echo '<span class="esub-copy-status" role="status"></span>';
+        echo '</div>';
     }
 }

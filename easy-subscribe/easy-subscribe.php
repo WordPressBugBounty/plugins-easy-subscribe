@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       Easy Subscribe
  * Description:       Easy way to integrate the form and collect subscribers.
- * Version:           1.5.7
+ * Version:           2.0.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Devnet
@@ -12,12 +12,13 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       easy-subscribe
  * Domain Path:       /languages
+ *
  */
 use Devnet\EasySubscribe\Includes\Activator;
 use Devnet\EasySubscribe\Includes\Deactivator;
 use Devnet\EasySubscribe\Includes\Plugin;
 use Devnet\EasySubscribe\Includes\Uninstaller;
-// If this file is called directly, abort.
+// If this file is called directly, abort
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -39,7 +40,7 @@ if ( function_exists( 'devnet_esub_fs' ) ) {
                     'public_key'       => 'pk_fb60e997a9379fa986e287711e169',
                     'is_premium'       => false,
                     'premium_suffix'   => '(Pro)',
-                    'has_addons'       => true,
+                    'has_addons'       => false,
                     'has_paid_plans'   => true,
                     'is_org_compliant' => true,
                     'trial'            => [
@@ -131,10 +132,14 @@ if ( function_exists( 'devnet_esub_fs' ) ) {
     register_activation_hook( __FILE__, 'activate_plugin_easy_subscribe' );
     register_deactivation_hook( __FILE__, 'deactivate_plugin_easy_subscribe' );
     function run_devnet_easy_subscribe_update() {
+        require_once plugin_dir_path( __FILE__ ) . 'includes/activator.php';
         $db_version = (int) get_option( 'devnet_esub_db_version' );
         if ( !$db_version || $db_version < DEVNET_ESUB_DB_VERSION ) {
-            require_once plugin_dir_path( __FILE__ ) . 'includes/activator.php';
             Activator::update_table();
+        }
+        // Multilingual retirement and per-form messages, one request at a time.
+        if ( Activator::needs_migration() ) {
+            Activator::migrate();
         }
     }
 
@@ -144,11 +149,12 @@ if ( function_exists( 'devnet_esub_fs' ) ) {
         $plugin->run();
     }
 
-    define( 'DEVNET_ESUB_VERSION', '1.5.7' );
+    define( 'DEVNET_ESUB_VERSION', '2.0.0' );
     define( 'DEVNET_ESUB_DB_VERSION', 3 );
     define( 'DEVNET_ESUB_NAME', 'Easy Subscribe' );
     define( 'DEVNET_ESUB_SLUG', plugin_basename( __FILE__ ) );
-    define( 'DEVNET_ESUB_OPTIONS', devnet_esub_options() );
+    // Before the options are read, so they reflect any upgrade.
     run_devnet_easy_subscribe_update();
+    define( 'DEVNET_ESUB_OPTIONS', devnet_esub_options() );
     run_devnet_easy_subscribe();
 }

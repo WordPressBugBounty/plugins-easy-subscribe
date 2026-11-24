@@ -23,6 +23,133 @@ class Activator
 	}
 
 	/**
+	 * The Multilingual option forced translated defaults for these texts; an empty text
+	 * now means the same. Empty them once, keeping each site's output, then drop the flag.
+	 */
+	public static function retire_multilingual()
+	{
+		$general = get_option('devnet_esub_general');
+
+		if (empty($general['multilingual'])) {
+			return;
+		}
+
+		$fields = ['name_field_label', 'last_name_field_label', 'gdpr_text', 'email_field_label', 'button_label', 'content_before_form', 'success', 'exists', 'spam'];
+		$groups = array_merge(['devnet_esub_form', 'devnet_esub_messages'], (array) get_option('devnet_esub_forms', []));
+
+		foreach ($groups as $group) {
+			$values = get_option($group);
+
+			if (!is_array($values)) {
+				continue;
+			}
+
+			foreach ($fields as $field) {
+				if (isset($values[$field])) {
+					$values[$field] = '';
+				}
+			}
+
+			update_option($group, $values);
+		}
+
+		unset($general['multilingual']);
+		update_option('devnet_esub_general', $general);
+	}
+
+	/** Option names holding one form each: the base form, added forms and an existing Product Form. */
+	private static function form_groups()
+	{
+		$groups = array_merge(['devnet_esub_form'], (array) get_option('devnet_esub_forms', []));
+		if (is_array(get_option('devnet_esub_form_product'))) {
+			$groups[] = 'devnet_esub_form_product';
+		}
+		return array_unique($groups);
+	}
+
+	/**
+	 * Whether the one-time updates have work left: the old Multilingual flag, messages never copied, or a form
+	 * without its own messages (1.5.x saved it again after a downgrade). Cheap: the options are autoloaded.
+	 */
+	public static function needs_migration()
+	{
+		$general = get_option('devnet_esub_general');
+		if (!empty($general['multilingual']) || !get_option('devnet_esub_form_messages_migrated')) {
+			return true;
+		}
+		foreach (self::form_groups() as $group) {
+			$saved = get_option($group);
+			if (is_array($saved) && !array_key_exists('success', $saved)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Runs the one-time updates in one request at a time. They read and write whole options, so the first visits
+	 * after an update, arriving together, would overwrite each other's work. INSERT IGNORE on the unique option
+	 * name lets one request in (add_option() wouldn't: it updates an existing row); the others skip, and see the
+	 * result on their next request. A lock older than 5 minutes (a request that died) is taken over.
+	 */
+	public static function migrate()
+	{
+		global $wpdb;
+
+		$lock = 'devnet_esub_migration_lock';
+		$now  = time();
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- An atomic lock: no options API call inserts without updating.
+		$locked = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $lock, $now))
+			|| $wpdb->query($wpdb->prepare("UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $now, $lock, $now - 300));
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
+
+		if (!$locked) {
+			return false;
+		}
+
+		// Another request may have finished since this one loaded the options: read them again, not from the cache.
+		foreach (['alloptions', 'notoptions', 'devnet_esub_general', 'devnet_esub_messages', 'devnet_esub_forms', 'devnet_esub_form_product', 'devnet_esub_form_messages_migrated'] as $key) {
+			wp_cache_delete($key, 'options');
+		}
+		foreach (self::form_groups() as $group) {
+			wp_cache_delete($group, 'options');
+		}
+
+		self::retire_multilingual();
+		$done = self::migrate_form_messages();
+
+		delete_option($lock);
+
+		return $done;
+	}
+
+	/**
+	 * Copy the shared messages into every form that has none, preserving overrides and the legacy option for
+	 * rollback. Safe to repeat: forms that have their messages are left alone.
+	 */
+	public static function migrate_form_messages()
+	{
+		$messages = (array) get_option('devnet_esub_messages', []);
+		$keys = ['success', 'exists', 'error', 'spam', 'pending_confirmation'];
+		foreach (self::form_groups() as $group) {
+			$saved = (array) get_option($group, []);
+			$values = $saved;
+			foreach ($keys as $key) {
+				if (!array_key_exists($key, $values)) {
+					$values[$key] = $messages[$key] ?? '';
+				}
+			}
+			if ($values !== $saved && !update_option($group, $values)) {
+				error_log('Easy Subscribe: form message migration failed for ' . $group . '; retrying on the next request.');
+				return false;
+			}
+		}
+		// update_option() is false when the value is already stored: a repeat run is still a success.
+		return get_option('devnet_esub_form_messages_migrated') || update_option('devnet_esub_form_messages_migrated', 1);
+	}
+
+	/**
 	 * Create custom tables.
 	 *  
 	 */

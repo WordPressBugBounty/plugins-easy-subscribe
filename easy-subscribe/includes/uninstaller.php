@@ -13,11 +13,8 @@ class Uninstaller
 
     public static function cleanup()
     {
-        $options = get_option('devnet_esub_general');
-
-        $delete_plugin_data = $options['delete_plugin_data'] ?? false;
-
-        if ($delete_plugin_data) {
+        // Opt-in only, e.g. add_filter('esub_delete_plugin_data', '__return_true');
+        if (apply_filters('esub_delete_plugin_data', false)) {
 
             $all_plugins = get_plugins();
 
@@ -48,6 +45,7 @@ class Uninstaller
         delete_option('devnet_esub_forms');
         delete_option('devnet_esub_form');
         delete_option('devnet_esub_messages');
+        delete_option('devnet_esub_form_messages_migrated');
         delete_option('devnet_esub_db_version');
     }
 

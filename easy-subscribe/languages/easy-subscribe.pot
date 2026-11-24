@@ -1,23 +1,25 @@
-# Copyright (C) 2025 Devnet
+# Copyright (C) 2026 Devnet
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Easy Subscribe 1.4.1\n"
+"Project-Id-Version: Easy Subscribe 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/easy-subscribe\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-24T08:04:37+00:00\n"
+"POT-Creation-Date: 2026-11-21T20:50:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: easy-subscribe\n"
 
 #. Plugin Name of the plugin
 #: easy-subscribe.php
-#: admin/admin.php:198
-#: admin/admin.php:199
+#: admin/admin.php:237
+#: admin/admin.php:238
+#: admin/settings.php:146
+#: modules/woocommerce/admin.php:47
 msgid "Easy Subscribe"
 msgstr ""
 
@@ -36,386 +38,453 @@ msgstr ""
 msgid "https://devnet.hr"
 msgstr ""
 
-#: admin/admin.php:122
-msgid "30 days"
+#: admin/admin.php:150
+msgid "Add form"
 msgstr ""
 
-#: admin/admin.php:123
-msgid "3 months"
+#: admin/admin.php:151
+msgid "Delete form"
 msgstr ""
 
-#: admin/admin.php:124
-msgid "6 months"
+#: admin/admin.php:152
+msgid "Duplicate form"
 msgstr ""
 
-#: admin/admin.php:125
-msgid "12 months"
+#: admin/admin.php:153
+msgid "Copied"
 msgstr ""
 
-#: admin/admin.php:126
-msgid "Are you sure you want to proceed? This action will irreversibly delete old data."
+#: admin/admin.php:154
+msgid "Press Ctrl+C (Cmd+C on Mac) to copy"
 msgstr ""
 
-#: admin/admin.php:127
-msgid "%s old entries has been successfully deleted."
-msgstr ""
-
-#: admin/admin.php:128
-msgid "No old data was found or deleted."
-msgstr ""
-
-#: admin/admin.php:155
+#: admin/admin.php:189
 msgid "Please select at least one field."
 msgstr ""
 
-#: admin/admin.php:209
-#: admin/admin.php:210
-#: admin/admin.php:242
+#: admin/admin.php:190
+msgid "Are you sure you want to proceed? This action will irreversibly delete old data."
+msgstr ""
+
+#. translators: %s: number of deleted entries
+#: admin/admin.php:192
+msgid "%s old entries has been successfully deleted."
+msgstr ""
+
+#: admin/admin.php:193
+msgid "No old data was found or deleted."
+msgstr ""
+
+#: admin/admin.php:248
+#: admin/admin.php:249
+#: admin/admin.php:310
 msgid "Settings"
 msgstr ""
 
-#: admin/admin.php:217
-#: admin/admin.php:218
+#: admin/admin.php:256
+#: admin/admin.php:257
 #: admin/partials/subscribers-page.php:22
 msgid "Subscribers"
 msgstr ""
 
-#: admin/admin.php:326
+#: admin/admin.php:275
+#: admin/admin.php:276
+msgid "More Free Plugins"
+msgstr ""
+
+#: admin/admin.php:403
 msgid "OMG you can not view private data."
 msgstr ""
 
-#: admin/options.php:26
-msgid "Multilingual"
-msgstr ""
-
-#: admin/options.php:27
-msgid "Use your own translated strings."
-msgstr ""
-
-#: admin/options.php:33
-msgid "Delete entries older than"
-msgstr ""
-
-#: admin/options.php:35
-msgid "-- Select --"
-msgstr ""
-
-#: admin/options.php:42
-msgid "Delete all plugin data on uninstall"
+#: admin/options.php:36
+msgid "Enable Form"
 msgstr ""
 
 #: admin/options.php:43
-msgid "Enabling this option will ensure that all data associated with the plugin, including settings and all subscribers, will be completely removed from the database upon uninstallation of the plugin."
+msgid "Text above the form"
 msgstr ""
 
-#: admin/options.php:76
-msgid "Enable"
+#: admin/options.php:44
+msgid "Optional. For example, a heading and a sentence about what subscribers get."
 msgstr ""
 
-#: admin/options.php:82
-msgid "Double Opt-In"
+#: admin/options.php:52
+#: includes/defaults.php:61
+msgid "Email"
 msgstr ""
 
-#: admin/options.php:88
-msgid "Show only for logged in users"
+#: admin/options.php:60
+#: includes/defaults.php:52
+msgid "Name"
 msgstr ""
 
-#: admin/options.php:94
-msgid "List name"
+#: admin/options.php:66
+msgid "Show the name field"
 msgstr ""
 
-#: admin/options.php:101
-msgid "Confirmation"
+#: admin/options.php:73
+#: includes/defaults.php:54
+msgid "Last name"
 msgstr ""
 
-#: admin/options.php:103
-#: admin/options.php:411
-msgid "Message"
+#: admin/options.php:79
+msgid "Show the last name field"
 msgstr ""
 
-#: admin/options.php:104
-msgid "Go to URL (redirect) - (PRO)"
+#: admin/options.php:86
+msgid "Consent checkbox"
+msgstr ""
+
+#: admin/options.php:92
+msgid "Show the consent checkbox (GDPR)"
+msgstr ""
+
+#: admin/options.php:99
+msgid "Button"
+msgstr ""
+
+#: admin/options.php:107
+msgid "Blog posts"
+msgstr ""
+
+#: admin/options.php:109
+#: admin/options.php:379
+#: modules/woocommerce/settings.php:178
+msgid "Don’t add automatically"
+msgstr ""
+
+#: admin/options.php:110
+msgid "Before the post content - (PRO)"
 msgstr ""
 
 #: admin/options.php:111
-msgid "Confirmation Redirect URL"
+msgid "After the post content - (PRO)"
 msgstr ""
 
-#: admin/options.php:118
-msgid "Automatic Form Placement"
+#: admin/options.php:114
+msgid "Add this form to every blog post automatically."
 msgstr ""
 
-#: admin/options.php:125
-msgid "Form position in blog posts"
+#: admin/options.php:122
+msgid "Logged-in visitors only"
 msgstr ""
 
-#: admin/options.php:127
-#: admin/options.php:421
-msgid "Don’t insert automatically"
+#: admin/options.php:123
+msgid "Hide this form from visitors who are not logged in."
 msgstr ""
 
-#: admin/options.php:128
-msgid "Before content - (PRO)"
-msgstr ""
-
-#: admin/options.php:129
-msgid "After content - (PRO)"
-msgstr ""
-
-#: admin/options.php:132
-msgid "Select where to automatically insert this form within blog post content."
-msgstr ""
-
-#: admin/options.php:139
-msgid "Fields"
-msgstr ""
-
-#: admin/options.php:145
-msgid "Name field"
-msgstr ""
-
-#: admin/options.php:151
-msgid "Name label"
-msgstr ""
-
-#: admin/options.php:158
-msgid "Last name field"
-msgstr ""
-
-#: admin/options.php:164
-msgid "Last name label"
-msgstr ""
-
-#: admin/options.php:171
-msgid "GDPR confirmation"
-msgstr ""
-
-#: admin/options.php:177
-msgid "GDPR text"
-msgstr ""
-
-#: admin/options.php:184
-msgid "Email label"
-msgstr ""
-
-#: admin/options.php:191
-msgid "Button label"
-msgstr ""
-
-#: admin/options.php:198
-msgid "Honeypot - Anti-Spam"
-msgstr ""
-
-#: admin/options.php:199
-msgid "Silently blocks bots and reduces spam submissions with an invisible field that real users won't see. Recommended to keep this enabled for better protection."
-msgstr ""
-
-#: admin/options.php:205
-msgid "Design"
-msgstr ""
-
-#: admin/options.php:211
+#: admin/options.php:130
+#: admin/options.php:424
 msgid "Layout"
 msgstr ""
 
-#: admin/options.php:213
-msgid "Inline"
+#: admin/options.php:132
+msgid "Inline: all fields in one row"
 msgstr ""
 
-#: admin/options.php:214
-msgid "Vertical"
+#: admin/options.php:133
+msgid "Stacked: one field per row"
 msgstr ""
 
-#: admin/options.php:215
-msgid "Combination"
+#: admin/options.php:134
+msgid "Combined: names in one row, email below"
 msgstr ""
 
-#: admin/options.php:222
-msgid "Style"
+#: admin/options.php:142
+msgid "Field style"
 msgstr ""
 
-#: admin/options.php:224
+#: admin/options.php:144
 msgid "Default"
 msgstr ""
 
-#: admin/options.php:225
-msgid "Standard"
+#: admin/options.php:145
+msgid "Underlined"
 msgstr ""
 
-#: admin/options.php:226
+#: admin/options.php:146
 msgid "Outlined"
 msgstr ""
 
-#: admin/options.php:227
+#: admin/options.php:147
 msgid "Filled"
 msgstr ""
 
-#: admin/options.php:235
+#: admin/options.php:156
 msgid "Field size"
 msgstr ""
 
-#: admin/options.php:237
+#: admin/options.php:158
 msgid "Small"
 msgstr ""
 
-#: admin/options.php:238
+#: admin/options.php:159
 msgid "Medium"
 msgstr ""
 
-#: admin/options.php:239
+#: admin/options.php:160
 msgid "Large"
 msgstr ""
 
-#: admin/options.php:246
-msgid "Form width"
+#: admin/options.php:168
+msgid "Icons in fields"
 msgstr ""
 
-#: admin/options.php:247
-#: admin/options.php:297
-msgid "Set 0 for full width"
+#: admin/options.php:169
+msgid "Show a small icon at the start of the name and email fields."
 msgstr ""
 
-#: admin/options.php:257
-msgid "Form alignment"
+#: admin/options.php:176
+msgid "Main color"
 msgstr ""
 
-#: admin/options.php:259
-#: admin/options.php:310
-msgid "left"
+#: admin/options.php:177
+msgid "Button and highlighted field borders."
 msgstr ""
 
-#: admin/options.php:260
-#: admin/options.php:311
-msgid "right"
-msgstr ""
-
-#: admin/options.php:261
-#: admin/options.php:312
-msgid "center"
-msgstr ""
-
-#: admin/options.php:268
-msgid "Primary color"
-msgstr ""
-
-#: admin/options.php:274
-msgid "Lighten Form Fields"
-msgstr ""
-
-#: admin/options.php:275
-msgid "Enable this setting to improve form visibility on darker backgrounds by making the fields lighter."
-msgstr ""
-
-#: admin/options.php:281
-msgid "Field background color"
-msgstr ""
-
-#: admin/options.php:287
+#: admin/options.php:184
+#: modules/popup/presets.php:93
 msgid "Text color"
 msgstr ""
 
-#: admin/options.php:293
+#: admin/options.php:191
+msgid "Field background"
+msgstr ""
+
+#: admin/options.php:198
+msgid "Lighter fields"
+msgstr ""
+
+#: admin/options.php:199
+msgid "Makes the fields easier to see on a dark background."
+msgstr ""
+
+#: admin/options.php:206
+msgid "Form width"
+msgstr ""
+
+#: admin/options.php:207
+msgid "0 = full width"
+msgstr ""
+
+#: admin/options.php:218
+msgid "Form alignment"
+msgstr ""
+
+#: admin/options.php:220
+#: admin/options.php:248
+msgid "Left"
+msgstr ""
+
+#: admin/options.php:221
+#: admin/options.php:249
+msgid "Center"
+msgstr ""
+
+#: admin/options.php:222
+#: admin/options.php:250
+msgid "Right"
+msgstr ""
+
+#: admin/options.php:233
 msgid "Button width"
 msgstr ""
 
-#: admin/options.php:296
-msgid "Adjusts the width of the button when on a separate line, eg. vertical layout or after the breakpoint."
+#: admin/options.php:234
+msgid "Used when the button sits on its own row. 0 = full width"
 msgstr ""
 
-#: admin/options.php:308
+#: admin/options.php:246
 msgid "Button alignment"
 msgstr ""
 
-#: admin/options.php:314
-msgid "Sets the alignment of the button when on a separate line, eg. vertical layout or after the breakpoint."
+#: admin/options.php:258
+msgid "Custom stacking width"
 msgstr ""
 
-#: admin/options.php:320
-msgid "Custom breakpoint"
+#: admin/options.php:259
+msgid "When the form gets narrow, its fields move onto separate rows automatically. Turn this on to choose that width yourself."
 msgstr ""
 
-#: admin/options.php:323
-msgid "Customize breakpoints for the \"Inline\" layout form."
+#: admin/options.php:267
+#: admin/options.php:279
+#: admin/options.php:291
+msgid "Stack fields below"
 msgstr ""
 
-#: admin/options.php:324
-msgid "Form elements rearrange based on the form's size. When the form's space is reduced, fields or buttons may shift to a new line to ensure the form remains easy to use and visually appealing."
+#: admin/options.php:268
+#: admin/options.php:280
+#: admin/options.php:292
+msgid "Form width at which the fields move onto separate rows."
 msgstr ""
 
-#: admin/options.php:325
-msgid "Note: These are not traditional media queries but container queries."
-msgstr ""
-
-#: admin/options.php:332
-msgid "Breakpoint 1"
-msgstr ""
-
-#: admin/options.php:333
-msgid "This is active only when both the 'Name' and 'Last Name' fields are enabled."
-msgstr ""
-
-#: admin/options.php:343
-msgid "Breakpoint 2"
-msgstr ""
-
-#: admin/options.php:344
-msgid "This is active when either the 'Name' or 'Last Name' field is enabled."
-msgstr ""
-
-#: admin/options.php:354
-msgid "Breakpoint 3"
-msgstr ""
-
-#: admin/options.php:355
-msgid "This is active only when the 'Email' field is enabled."
-msgstr ""
-
-#: admin/options.php:365
-msgid "Text"
-msgstr ""
-
-#: admin/options.php:371
-msgid "Before form"
-msgstr ""
-
-#: admin/options.php:378
+#: admin/options.php:303
+#: admin/options.php:428
 msgid "Custom CSS"
 msgstr ""
 
-#: admin/options.php:391
-msgid "Shortcode"
+#: admin/options.php:304
+msgid "Deprecated: style forms with your theme CSS or Additional CSS using ::part() (see the plugin FAQ). Empty this field to remove it."
 msgstr ""
 
-#: admin/options.php:412
-msgid "Go to URL (redirect)"
+#: admin/options.php:312
+msgid "When someone subscribes"
+msgstr ""
+
+#: admin/options.php:314
+#: admin/options.php:369
+msgid "Show a message"
+msgstr ""
+
+#: admin/options.php:315
+msgid "Go to another page - (PRO)"
+msgstr ""
+
+#: admin/options.php:323
+msgid "Page address (URL)"
+msgstr ""
+
+#: admin/options.php:331
+msgid "Double opt-in"
+msgstr ""
+
+#: admin/options.php:332
+msgid "Send a confirmation email. The subscription is confirmed when the link in it is clicked."
+msgstr ""
+
+#: admin/options.php:339
+msgid "Subscriber list"
+msgstr ""
+
+#: admin/options.php:340
+msgid "Subscribers from this form are saved to this list."
+msgstr ""
+
+#: admin/options.php:370
+msgid "Go to another page"
+msgstr ""
+
+#: admin/options.php:380
+msgid "Before the post content"
+msgstr ""
+
+#: admin/options.php:381
+msgid "After the post content"
+msgstr ""
+
+#: admin/options.php:410
+msgid "Leave a text empty to use the default, translated automatically."
+msgstr ""
+
+#: admin/options.php:414
+#: admin/settings.php:82
+msgid "Form"
+msgstr ""
+
+#: admin/options.php:416
+msgid "Introduction"
+msgstr ""
+
+#: admin/options.php:417
+msgid "Fields"
+msgstr ""
+
+#: admin/options.php:417
+msgid "Turn fields on or off and change the text visitors see."
+msgstr ""
+
+#: admin/options.php:418
+msgid "Where it appears"
+msgstr ""
+
+#: admin/options.php:418
+msgid "Paste the shortcode from the top of this page into any page, post or widget, or add the form automatically."
 msgstr ""
 
 #: admin/options.php:422
-msgid "Before content"
+msgid "Style"
 msgstr ""
 
-#: admin/options.php:423
-msgid "After content"
+#: admin/options.php:425
+msgid "Colors"
+msgstr ""
+
+#: admin/options.php:426
+msgid "Width and alignment"
+msgstr ""
+
+#: admin/options.php:427
+msgid "Small screens"
+msgstr ""
+
+#: admin/options.php:432
+msgid "Subscription"
+msgstr ""
+
+#: admin/options.php:434
+msgid "After signup"
+msgstr ""
+
+#: admin/options.php:435
+msgid "Messages"
+msgstr ""
+
+#: admin/options.php:435
+msgid "Shown to visitors after they submit the form."
+msgstr ""
+
+#: admin/options.php:439
+#: admin/options.php:441
+msgid "Popup"
+msgstr ""
+
+#: admin/options.php:442
+#: modules/popup/presets.php:88
+msgid "Design"
+msgstr ""
+
+#: admin/options.php:443
+msgid "Colors and size"
+msgstr ""
+
+#: admin/options.php:443
+msgid "Leave a setting empty to use the design’s default."
+msgstr ""
+
+#: admin/options.php:444
+msgid "Popup text"
+msgstr ""
+
+#: admin/options.php:445
+msgid "When to open"
+msgstr ""
+
+#: admin/options.php:446
+msgid "Where to open"
 msgstr ""
 
 #: admin/options.php:447
-msgid "Subscribed"
-msgstr ""
-
-#: admin/options.php:454
-msgid "Email already subscribed"
+msgid "How often"
 msgstr ""
 
 #: admin/options.php:461
-msgid "Error while submitting"
+msgid "Subscribed"
 msgstr ""
 
 #: admin/options.php:468
-msgid "Spam"
+msgid "Confirmation email sent"
 msgstr ""
 
 #: admin/options.php:475
-msgid "Pending confirmation"
+msgid "Already subscribed"
+msgstr ""
+
+#: admin/options.php:482
+msgid "Something went wrong"
+msgstr ""
+
+#: admin/options.php:489
+msgid "Blocked as spam"
 msgstr ""
 
 #: admin/partials/subscribers-page.php:32
@@ -423,6 +492,8 @@ msgid "Filter:"
 msgstr ""
 
 #: admin/partials/subscribers-page.php:35
+#: modules/woocommerce/settings.php:88
+#: modules/woocommerce/settings.php:144
 msgid "List"
 msgstr ""
 
@@ -434,119 +505,670 @@ msgstr ""
 msgid "Show results"
 msgstr ""
 
-#: admin/partials/subscribers-page.php:55
-msgid "Customize CSV:"
+#: admin/partials/subscribers-page.php:47
+#: admin/partials/subscribers-page.php:48
+msgid "All"
 msgstr ""
 
 #: admin/partials/subscribers-page.php:58
-msgid "File name: "
+msgid "Customize CSV:"
 msgstr ""
 
-#: admin/partials/subscribers-page.php:63
+#: admin/partials/subscribers-page.php:61
 msgid "Delimiter: "
 msgstr ""
 
-#: admin/partials/subscribers-page.php:68
+#: admin/partials/subscribers-page.php:66
 msgid "Name: "
 msgstr ""
 
-#: admin/partials/subscribers-page.php:73
+#: admin/partials/subscribers-page.php:71
 msgid "Last name: "
 msgstr ""
 
-#: admin/partials/subscribers-page.php:78
+#: admin/partials/subscribers-page.php:76
 msgid "Email: "
 msgstr ""
 
-#: admin/partials/subscribers-page.php:82
+#: admin/partials/subscribers-page.php:80
 msgid "Download CSV"
 msgstr ""
 
-#: admin/partials/subscribers-page.php:93
+#: admin/partials/subscribers-page.php:91
 msgid "Delete selected"
 msgstr ""
 
-#: admin/settings.php:57
+#: admin/partials/subscribers-page.php:94
+msgid "Delete entries older than"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:96
+#: modules/woocommerce/settings.php:97
+msgid "-- Select --"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:97
+msgid "30 days"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:98
+msgid "3 months"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:99
+msgid "6 months"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:100
+msgid "12 months"
+msgstr ""
+
+#: admin/partials/subscribers-page.php:102
+msgid "Delete now"
+msgstr ""
+
+#: admin/settings-api.php:1254
+msgid "Settings sections"
+msgstr ""
+
+#: admin/settings-api.php:1269
+msgid "Settings section"
+msgstr ""
+
+#: admin/settings.php:61
 msgid "General"
 msgstr ""
 
-#: admin/settings.php:66
+#: admin/settings.php:71
 msgid "Forms"
 msgstr ""
 
-#: admin/settings.php:77
-msgid "Form"
-msgstr ""
-
-#: admin/settings.php:91
-msgid "Messages"
-msgstr ""
-
-#: admin/settings.php:166
+#: admin/settings.php:193
 msgid ""
 "<strong>Attention:</strong> It appears that some required tables are missing in the database.<br>\n"
 "                Please click the button below to repair the database tables."
 msgstr ""
 
-#: admin/settings.php:169
+#: admin/settings.php:196
 msgid "Repair"
 msgstr ""
 
-#: admin/settings.php:177
-msgid "Preview Form"
+#: admin/settings.php:206
+msgid "White background"
 msgstr ""
 
-#: includes/defaults.php:41
-msgid "Name"
+#: admin/settings.php:206
+msgid "Gray background"
 msgstr ""
 
-#: includes/defaults.php:43
-msgid "Last name"
+#: admin/settings.php:206
+msgid "Black background"
 msgstr ""
 
-#: includes/defaults.php:45
+#: admin/settings.php:210
+msgid "Close preview"
+msgstr ""
+
+#: admin/settings.php:227
+msgid "Disabled"
+msgstr ""
+
+#: admin/settings.php:228
+msgid "Preview"
+msgstr ""
+
+#: admin/settings.php:231
+msgid "Shortcode"
+msgstr ""
+
+#: admin/settings.php:233
+#: modules/popup/settings.php:283
+msgid "Copy"
+msgstr ""
+
+#: admin/upsell.php:59
+#: admin/upsell.php:112
+#: modules/woocommerce/settings.php:55
+msgid "WooCommerce"
+msgstr ""
+
+#: admin/upsell.php:99
+msgid "Show this form in a popup"
+msgstr ""
+
+#: admin/upsell.php:101
+msgid "Ready-made designs, with your own colors and image."
+msgstr ""
+
+#: admin/upsell.php:102
+msgid "Open it after a delay, or when a visitor clicks a button or link."
+msgstr ""
+
+#: admin/upsell.php:103
+msgid "Choose the pages it opens on and how often."
+msgstr ""
+
+#: admin/upsell.php:105
+msgid "Upgrade to PRO"
+msgstr ""
+
+#: admin/upsell.php:114
+msgid "Ecommerce plan"
+msgstr ""
+
+#: admin/upsell.php:115
+msgid "Grow your list from your store"
+msgstr ""
+
+#: admin/upsell.php:117
+msgid "A subscribe form on product pages, inline or in a popup."
+msgstr ""
+
+#: admin/upsell.php:118
+msgid "Add customers to a list automatically when they order."
+msgstr ""
+
+#: admin/upsell.php:119
+msgid "Import email addresses from past orders."
+msgstr ""
+
+#: admin/upsell.php:120
+msgid "A marketing consent checkbox on the classic checkout."
+msgstr ""
+
+#: admin/upsell.php:122
+msgid "Upgrade to the Ecommerce plan"
+msgstr ""
+
+#: admin/upsell.php:142
+msgid "(opens in a new tab)"
+msgstr ""
+
+#. translators: 1: site name
+#: includes/defaults.php:58
 msgid "I hereby give consent for my personal data (first name, last name, email address) to be used for marketing purposes (receiving newsletters and catalogs) by the online store %1$s. The store will use them solely for these purposes and will not disclose them to third parties, using the data until the withdrawal of consent. I am aware of the right to request access to personal data, correction, deletion of data, processing limitation, the right to object to processing, the right to data portability, the right to lodge a complaint with the competent authority (Personal Data Protection Agency), and to ask the data protection officer if I believe there has been any violation in the processing of personal data."
 msgstr ""
 
-#: includes/defaults.php:46
-msgid "Email"
-msgstr ""
-
-#: includes/defaults.php:47
+#: includes/defaults.php:62
 msgid "Submit"
 msgstr ""
 
-#: includes/defaults.php:79
+#: includes/defaults.php:97
 msgid "Successfully subscribed!"
 msgstr ""
 
-#: includes/defaults.php:80
+#: includes/defaults.php:98
 msgid "This email is already subscribed."
 msgstr ""
 
-#: includes/defaults.php:81
+#: includes/defaults.php:99
 msgid "Oops! It seems there was an error while submitting. Please refresh the page and try again. If the issue persists, feel free to contact us for assistance. Thank you!"
 msgstr ""
 
-#: includes/defaults.php:82
+#: includes/defaults.php:100
 msgid "Error - possible spam detected."
 msgstr ""
 
-#: includes/defaults.php:83
+#: includes/defaults.php:101
 msgid "Please check your email to confirm your subscription."
 msgstr ""
 
-#: includes/notifier.php:45
+#: includes/notifier.php:46
 msgid "Confirm Your Subscription"
 msgstr ""
 
-#: includes/notifier.php:49
+#. translators: 1: verification url
+#: includes/notifier.php:51
 msgid ""
 "<p>Thank you for subscribing! Please confirm your subscription by clicking the link below:</p>\n"
 "            <p><a href=\"%s\" style=\"background-color:#0073aa;color:#ffffff;padding:10px 15px;text-decoration:none;display:inline-block;font-weight:bold;border-radius:5px;\">Confirm Subscription</a></p>\n"
 "            <p>If you did not subscribe, you can ignore this email.</p>"
 msgstr ""
 
-#: public/public.php:228
+#: modules/popup/config.php:27
+#: modules/popup/integration.php:34
+#: modules/popup/introduction.php:25
+#: modules/popup/presets.php:148
+msgid "Subscribe"
+msgstr ""
+
+#: modules/popup/integration.php:35
+msgid "Choose popup image"
+msgstr ""
+
+#: modules/popup/integration.php:36
+msgid "Use image"
+msgstr ""
+
+#: modules/popup/introduction.php:58
+msgid "Custom popup text"
+msgstr ""
+
+#: modules/popup/introduction.php:59
+msgid "Text"
+msgstr ""
+
+#: modules/popup/introduction.php:68
+msgid "The popup shows the same introduction as the form."
+msgstr ""
+
+#: modules/popup/introduction.php:68
+msgid "Edit the introduction"
+msgstr ""
+
+#: modules/popup/introduction.php:69
+msgid "This text appears only in the popup. Start with a heading if you want one."
+msgstr ""
+
+#: modules/popup/module.php:99
+msgid "Close popup"
+msgstr ""
+
+#: modules/popup/presets.php:16
+msgid "Form style"
+msgstr ""
+
+#: modules/popup/presets.php:16
+msgid "Same look as the form on your pages."
+msgstr ""
+
+#: modules/popup/presets.php:17
+msgid "Minimal"
+msgstr ""
+
+#: modules/popup/presets.php:17
+msgid "Light and simple, with plenty of space."
+msgstr ""
+
+#: modules/popup/presets.php:18
+msgid "Card"
+msgstr ""
+
+#: modules/popup/presets.php:18
+msgid "Rounded card with a bold button."
+msgstr ""
+
+#: modules/popup/presets.php:19
+msgid "Image beside form"
+msgstr ""
+
+#: modules/popup/presets.php:19
+msgid "Your image next to the form. Made for the center."
+msgstr ""
+
+#: modules/popup/presets.php:20
+msgid "Small corner box"
+msgstr ""
+
+#: modules/popup/presets.php:20
+msgid "Small and discreet. Made for a corner."
+msgstr ""
+
+#: modules/popup/presets.php:21
+msgid "Corner with header"
+msgstr ""
+
+#: modules/popup/presets.php:21
+msgid "Colored header and an optional image. Made for a corner."
+msgstr ""
+
+#: modules/popup/presets.php:89
+msgid "Image"
+msgstr ""
+
+#: modules/popup/presets.php:90
+msgid "Popup heading"
+msgstr ""
+
+#: modules/popup/presets.php:91
+msgid "Popup description"
+msgstr ""
+
+#: modules/popup/presets.php:92
+msgid "Background color"
+msgstr ""
+
+#: modules/popup/presets.php:94
+msgid "Button color"
+msgstr ""
+
+#: modules/popup/presets.php:95
+msgid "Border color"
+msgstr ""
+
+#: modules/popup/presets.php:96
+msgid "Rounded corners"
+msgstr ""
+
+#: modules/popup/presets.php:97
+msgid "Width"
+msgstr ""
+
+#: modules/popup/presets.php:98
+msgid "Inner spacing"
+msgstr ""
+
+#: modules/popup/presets.php:123
+msgid "Popup design"
+msgstr ""
+
+#: modules/popup/presets.php:141
+msgid "Choose image"
+msgstr ""
+
+#: modules/popup/presets.php:141
+msgid "Remove image"
+msgstr ""
+
+#: modules/popup/presets.php:142
+msgid "Optional. Shown beside the form, or above it in corners and on phones."
+msgstr ""
+
+#: modules/popup/presets.php:150
+msgid "Choose color"
+msgstr ""
+
+#: modules/popup/settings.php:145
+msgid "Search pages and posts…"
+msgstr ""
+
+#: modules/popup/settings.php:148
+msgid "Unavailable content"
+msgstr ""
+
+#: modules/popup/settings.php:161
+msgid "Show in a popup"
+msgstr ""
+
+#: modules/popup/settings.php:162
+msgid "Open this form in a popup window. It works together with the form on your pages, and the form itself must be enabled."
+msgstr ""
+
+#: modules/popup/settings.php:168
+#: modules/popup/settings.php:229
+msgid "Open"
+msgstr ""
+
+#: modules/popup/settings.php:169
+msgid "Automatically, after a delay"
+msgstr ""
+
+#: modules/popup/settings.php:169
+msgid "Only when a visitor clicks a button"
+msgstr ""
+
+#: modules/popup/settings.php:174
+msgid "Delay"
+msgstr ""
+
+#: modules/popup/settings.php:175
+msgid "Seconds after the page loads. Use 0 to open right away."
+msgstr ""
+
+#: modules/popup/settings.php:176
+msgid "sec"
+msgstr ""
+
+#: modules/popup/settings.php:185
+#: modules/popup/settings.php:282
+msgid "Button link"
+msgstr ""
+
+#: modules/popup/settings.php:192
+msgid "Position"
+msgstr ""
+
+#: modules/popup/settings.php:194
+msgid "Center of the screen"
+msgstr ""
+
+#: modules/popup/settings.php:195
+msgid "Top left corner"
+msgstr ""
+
+#: modules/popup/settings.php:196
+msgid "Top right corner"
+msgstr ""
+
+#: modules/popup/settings.php:197
+msgid "Bottom left corner"
+msgstr ""
+
+#: modules/popup/settings.php:198
+msgid "Bottom right corner"
+msgstr ""
+
+#: modules/popup/settings.php:204
+msgid "Pages"
+msgstr ""
+
+#: modules/popup/settings.php:205
+msgid "All pages"
+msgstr ""
+
+#: modules/popup/settings.php:205
+msgid "Only selected pages"
+msgstr ""
+
+#: modules/popup/settings.php:205
+msgid "All pages except selected"
+msgstr ""
+
+#: modules/popup/settings.php:213
+msgid "Open on"
+msgstr ""
+
+#: modules/popup/settings.php:214
+msgid "Pages and posts where the popup opens. With none selected, it opens nowhere."
+msgstr ""
+
+#: modules/popup/settings.php:221
+msgid "Don’t open on"
+msgstr ""
+
+#: modules/popup/settings.php:222
+msgid "Pages and posts where the popup never opens."
+msgstr ""
+
+#: modules/popup/settings.php:230
+msgid "Once per visit"
+msgstr ""
+
+#: modules/popup/settings.php:230
+msgid "On every page view"
+msgstr ""
+
+#: modules/popup/settings.php:231
+msgid "After someone subscribes, it no longer opens automatically for them."
+msgstr ""
+
+#: modules/popup/settings.php:237
+msgid "After it is closed, wait"
+msgstr ""
+
+#: modules/popup/settings.php:238
+msgid "days"
+msgstr ""
+
+#: modules/popup/settings.php:242
+msgid "Before opening it again for the same visitor. Use 0 for no extra wait."
+msgstr ""
+
+#: modules/popup/settings.php:286
+msgid "To open the popup with a button, paste this as the button’s link. It works for buttons, images, text links and menu items."
+msgstr ""
+
+#: modules/woocommerce/admin.php:35
+msgid "Migrate Now"
+msgstr ""
+
+#: modules/woocommerce/admin.php:36
+msgid "Import billing emails from the selected orders? When checkout consent is enabled, only orders with saved marketing consent are included."
+msgstr ""
+
+#: modules/woocommerce/admin.php:37
+msgid "Imported %s subscribers."
+msgstr ""
+
+#: modules/woocommerce/admin.php:38
+msgid "Imported %s subscribers so far…"
+msgstr ""
+
+#: modules/woocommerce/admin.php:39
+#: modules/woocommerce/importer.php:40
+msgid "Import failed. Completed batches are retained; retrying will not duplicate subscribers."
+msgstr ""
+
+#: modules/woocommerce/admin.php:61
+#: modules/woocommerce/settings.php:60
+msgid "Product Form"
+msgstr ""
+
+#: modules/woocommerce/admin.php:63
+msgid "Use global setting"
+msgstr ""
+
+#: modules/woocommerce/admin.php:64
+msgid "Show"
+msgstr ""
+
+#: modules/woocommerce/admin.php:65
+msgid "Hide"
+msgstr ""
+
+#: modules/woocommerce/admin.php:67
+msgid "Controls both the inline form and popup on this product. The Product Form must be enabled in Easy Subscribe settings."
+msgstr ""
+
+#: modules/woocommerce/checkout.php:57
+#: modules/woocommerce/checkout.php:73
+msgid "Marketing consent"
+msgstr ""
+
+#: modules/woocommerce/checkout.php:121
+msgid "I agree to receive marketing emails and special offers"
+msgstr ""
+
+#: modules/woocommerce/importer.php:21
+msgid "You cannot import customers."
+msgstr ""
+
+#: modules/woocommerce/importer.php:28
+msgid "Select all or completed orders."
+msgstr ""
+
+#: modules/woocommerce/importer.php:33
+msgid "Invalid import page."
+msgstr ""
+
+#: modules/woocommerce/module.php:59
+msgid "Easy Subscribe: the active WooCommerce add-on is still handling your store. After verifying your Ecommerce license, deactivate the add-on to use the integrated module. Your settings and subscribers are retained."
+msgstr ""
+
+#: modules/woocommerce/module.php:66
+msgid "Activate WooCommerce to use the Easy Subscribe Ecommerce module."
+msgstr ""
+
+#: modules/woocommerce/settings.php:66
+msgid "Orders"
+msgstr ""
+
+#: modules/woocommerce/settings.php:72
+msgid "Checkout"
+msgstr ""
+
+#: modules/woocommerce/settings.php:95
+msgid "Migration"
+msgstr ""
+
+#: modules/woocommerce/settings.php:98
+msgid "All orders"
+msgstr ""
+
+#: modules/woocommerce/settings.php:99
+msgid "Completed orders"
+msgstr ""
+
+#: modules/woocommerce/settings.php:106
+msgid "Auto-Subscribe on"
+msgstr ""
+
+#: modules/woocommerce/settings.php:108
+msgid "None"
+msgstr ""
+
+#: modules/woocommerce/settings.php:109
+msgid "Order Completion"
+msgstr ""
+
+#: modules/woocommerce/settings.php:110
+msgid "Order Created"
+msgstr ""
+
+#: modules/woocommerce/settings.php:120
+msgid "Email Marketing Consent Checkbox"
+msgstr ""
+
+#: modules/woocommerce/settings.php:121
+msgid "Display an optional marketing consent checkbox during classic checkout. When enabled, order subscriptions and imports also require saved consent. Checkout Blocks are not supported."
+msgstr ""
+
+#: modules/woocommerce/settings.php:128
+msgid "Checkbox Label"
+msgstr ""
+
+#: modules/woocommerce/settings.php:129
+msgid "Text displayed next to the email marketing subscription checkbox during checkout."
+msgstr ""
+
+#: modules/woocommerce/settings.php:136
+msgid "GDPR text"
+msgstr ""
+
+#: modules/woocommerce/settings.php:137
+msgid "Optional text displayed below the newsletter subscription checkbox. Use this field to provide privacy information, explain how subscriber data is processed, or add links to your privacy policy."
+msgstr ""
+
+#: modules/woocommerce/settings.php:151
+msgid "Show in order details"
+msgstr ""
+
+#: modules/woocommerce/settings.php:176
+msgid "Product page"
+msgstr ""
+
+#: modules/woocommerce/settings.php:179
+msgid "Before the product meta"
+msgstr ""
+
+#: modules/woocommerce/settings.php:180
+msgid "In the product summary"
+msgstr ""
+
+#: modules/woocommerce/settings.php:188
+msgid "Products"
+msgstr ""
+
+#: modules/woocommerce/settings.php:190
+msgid "All products"
+msgstr ""
+
+#: modules/woocommerce/settings.php:191
+msgid "Only individually enabled products"
+msgstr ""
+
+#: modules/woocommerce/settings.php:193
+msgid "Products that show this form. Each product can override it in its Easy Subscribe tab."
+msgstr ""
+
+#: modules/woocommerce/settings.php:205
+msgid "Product name"
+msgstr ""
+
+#: modules/woocommerce/settings.php:223
+msgid "Opens only on product pages, for the products chosen under Form → Where it appears."
+msgstr ""
+
+#: public/public.php:236
 msgid "Email confirmed!"
 msgstr ""

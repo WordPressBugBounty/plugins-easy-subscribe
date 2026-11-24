@@ -102,10 +102,16 @@ class EasySubscribe_Public {
                 'list' => $list,
             ]
         );
+        // Block themes render the content before wp_enqueue_scripts: register the script here, or its data is dropped.
+        if ( !wp_script_is( $this->plugin_name, 'registered' ) ) {
+            $this->enqueue_scripts();
+        }
         wp_enqueue_script( $this->plugin_name );
         wp_localize_script( $this->plugin_name, 'devnet_esub_script', $script_data );
-        $content_before_form = $form['content_before_form'] ?? '';
-        $form_html = '<div class="easy-subscribe ' . esc_attr( $wrapper_id ) . '" data-wrapper-id="' . esc_attr( $wrapper_id ) . '">';
+        $content_before_form = apply_filters( 'esub_form_introduction', $form['content_before_form'] ?? '', $form_id );
+        $instance_id = wp_unique_id( 'esub-form-' );
+        $instance_list = $script_data['options']['forms'][$form_id]['list'] ?? $form['list'] ?? '';
+        $form_html = '<div class="easy-subscribe ' . esc_attr( $wrapper_id ) . '" data-wrapper-id="' . esc_attr( $wrapper_id ) . '" data-esub-form-id="' . esc_attr( $form_id ) . '" data-esub-instance-id="' . esc_attr( $instance_id ) . '" data-esub-list="' . esc_attr( $instance_list ) . '">';
         if ( $content_before_form ) {
             $form_html .= '<div class="esub-before-form">' . wp_kses_post( $content_before_form ) . '</div>';
         }
@@ -123,8 +129,9 @@ class EasySubscribe_Public {
         $is_confirmed = Helper::email_confirmation( $email, $token );
         if ( $is_confirmed ) {
             $options = Helper::get_all_options();
-            $success_message = $options['messages']['success'] ?? __( 'Email confirmed!', 'easy-subscribe' );
-            echo '<script>alert("' . esc_html( $success_message ) . '");</script>';
+            $form_id = ( isset( $_GET['esub_form'] ) && is_string( $_GET['esub_form'] ) ? sanitize_text_field( wp_unslash( $_GET['esub_form'] ) ) : '' );
+            $success_message = $options['forms'][$form_id]['success'] ?? $options['messages']['success'] ?? __( 'Email confirmed!', 'easy-subscribe' );
+            echo '<script>alert(' . wp_json_encode( $success_message, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ');</script>';
         }
     }
 

@@ -3,16 +3,14 @@
 namespace Devnet\EasySubscribe\Admin;
 
 
-
 if (! defined('ABSPATH')) {
     exit;
 }
 
-
 /**
  * Settings API wrapper class.
  * 
- * @updated    2026-03-12
+ * @updated    2026-10-08
  */
 
 class Settings_API
@@ -104,19 +102,20 @@ class Settings_API
         foreach ($this->settings_sections as $section) {
 
             // If set tabs, skip adding options and settings sections. We'll just use it as a wrapper.
-            if (filter_var($section['tabs'] ?? false, FILTER_VALIDATE_BOOL)) {
+            // A `render` section (e.g. an upgrade notice) has no options either.
+            if (filter_var($section['tabs'] ?? false, FILTER_VALIDATE_BOOL) || !empty($section['render'])) {
                 continue;
             }
 
             if (false == get_option($section['id'])) {
-                add_option($section['id']);
+                // Array default: add_option() runs this through sanitize_option_{$id}, and every
+                // module's sanitize callback treats a non-array value as invalid settings.
+                add_option($section['id'], []);
             }
 
             if (isset($section['desc']) && !empty($section['desc'])) {
-                $section['desc'] = '<div class="inside">' . $section['desc'] . '</div>';
-                $callback        = function () use ($section) {
-                    $desc = str_replace('"', '\"', $section['desc']);
-                    echo esc_html($desc);
+                $callback = function () use ($section) {
+                    echo '<div class="inside">' . wp_kses_post($section['desc']) . '</div>';
                 };
             } elseif (isset($section['callback'])) {
                 $callback = $section['callback'];
@@ -127,6 +126,15 @@ class Settings_API
             add_settings_section($section['id'], $section['title'], $callback, $section['id']);
         }
 
+        // Sections with a `layout` register each field into a per-group WP section (rendered by render_layout()).
+        // Fields with an unknown group stay in the section itself, so they are still rendered and saved.
+        $layout_groups = [];
+        foreach ($this->settings_sections as $section) {
+            foreach ($section['layout'] ?? [] as $panel) {
+                $layout_groups[$section['id']] = ($layout_groups[$section['id']] ?? ['header' => []]) + $panel['groups'];
+            }
+        }
+
         //register settings fields
         foreach ($this->settings_fields as $section => $field) {
             foreach ($field as $option) {
@@ -135,10 +143,20 @@ class Settings_API
                 $label    = $option['label'] ?? '';
                 $callback = $option['callback'] ?? [$this, 'callback_' . $type];
 
+                $group    = $option['group'] ?? '';
+
+                // Point the row label at the control the callback actually prints.
+                $label_for = "{$section}[{$name}]";
+                if ($type === 'checkbox' || $type === 'date') {
+                    $label_for = "dvnt-{$section}[{$name}]";
+                } elseif ($type === 'wysiwyg') {
+                    $label_for = "{$section}-{$name}";
+                }
+
                 $args = [
                     'id'                => $name,
                     'class'             => $option['class'] ?? $name,
-                    'label_for'         => "{$section}[{$name}]",
+                    'label_for'         => $label_for,
                     'desc'              => $option['desc'] ?? '',
                     'name'              => $label,
                     'section'           => $section,
@@ -158,11 +176,12 @@ class Settings_API
                     'cols'              => $option['cols'] ?? '',
                     'disabled'          => $option['disabled'] ?? '',
                     'pro_plan'          => $option['pro_plan'] ?? '',
-                    'fields'             => $option['fields'] ?? [],
+                    'fields'            => $option['fields'] ?? [],
                     'repeatable'        => $option['repeatable'] ?? false,
                     'tab_id'            => $option['tab_id'] ?? '',
                     'tabs'              => $option['tabs'] ?? [],
                     'prefix'             => $option['prefix'] ?? false,
+                    'toggle'            => $option['toggle'] ?? [],
                 ];
 
 
@@ -174,7 +193,9 @@ class Settings_API
                     $args['class'] .= ' ' . $args['pro_plan'];
                 }
 
-                add_settings_field("{$section}[{$name}]", $label, $callback, $section, $section, $args);
+                $wp_section = isset($layout_groups[$section][$group]) ? "{$section}__{$group}" : $section;
+
+                add_settings_field("{$section}[{$name}]", $label, $callback, $section, $wp_section, $args);
             }
         }
 
@@ -182,7 +203,7 @@ class Settings_API
         foreach ($this->settings_sections as $section) {
 
             // If set tabs, skip registering the section..
-            if (filter_var($section['tabs'] ?? false, FILTER_VALIDATE_BOOL)) {
+            if (filter_var($section['tabs'] ?? false, FILTER_VALIDATE_BOOL) || !empty($section['render'])) {
                 continue;
             }
 
@@ -197,14 +218,17 @@ class Settings_API
             'b'      => [],
             'em'     => [],
             'strong' => [],
+            'p'      => [],
             'input' => [
                 'type'     => [],
                 'readonly' => [],
+                'size'     => [],
                 'value'    => []
             ],
             'a'     => [
                 'href'   => [],
-                'target' => []
+                'target' => [],
+                'rel'    => []
             ],
             'div'   => [
                 'class'  => []
@@ -273,12 +297,24 @@ class Settings_API
         $value       = $this->get_option($args['id'], $args['section'], $args['std']);
         $size        = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $type        = isset($args['type']) ? $args['type'] : 'text';
-        $placeholder = empty($args['placeholder']) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+        $placeholder = empty($args['placeholder']) ? '' : $args['placeholder'];
         $maxlength   = isset($args['max']) ? $args['max'] : '';
         $disabled    = isset($args['disabled']) && $args['disabled'] == true ? 'disabled' : '';
+        $toggle      = $args['toggle'] ?? [];
+
+        // A switch (or a select, with `options`) in the same row, before the input.
+        if ($toggle) {
+            echo '<div class="devnet-toggle-field">';
+
+            if (isset($toggle['options'])) {
+                $this->toggle_select($args['section'], $toggle, $disabled);
+            } else {
+                $this->toggle_switch($args['section'], $toggle, $disabled);
+            }
+        }
 
         printf(
-            '<input type="%1$s" class="%2$s-text" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s" %6$s maxlength="%7$s" %8$s/>',
+            '<input type="%1$s" class="%2$s-text" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s" placeholder="%6$s" maxlength="%7$s" %8$s/>',
             esc_attr($type),
             esc_attr($size),
             esc_attr($args['section']),
@@ -289,7 +325,58 @@ class Settings_API
             esc_attr($disabled)
         );
 
+        if ($toggle) {
+            echo '</div>';
+        }
+
         printf('<p class="description">%s</p>', wp_kses($args['desc'], $this->kses_args()));
+    }
+
+    /**
+     * Switch for a field's `toggle` arg (`name`, `label`, `default`), saved as 1 or 0 like callback_checkbox().
+     * The text input stays enabled: a disabled input isn't posted, so saving would delete its text.
+     */
+    private function toggle_switch($section, $toggle, $disabled = '')
+    {
+        $name  = $toggle['name'];
+        $value = $this->get_option($name, $section, $toggle['default'] ?? 1);
+
+        printf('<label for="dvnt-%1$s[%2$s]" class="switch">', esc_attr($section), esc_attr($name));
+        printf('<input type="hidden" name="%1$s[%2$s]" value="0" />', esc_attr($section), esc_attr($name));
+        printf(
+            '<input type="checkbox" class="checkbox" id="dvnt-%1$s[%2$s]" name="%1$s[%2$s]" value="1" aria-label="%3$s" %4$s %5$s />',
+            esc_attr($section),
+            esc_attr($name),
+            esc_attr($toggle['label'] ?? ''),
+            checked(esc_attr($value), '1', false),
+            esc_attr($disabled)
+        );
+        echo '<span class="devnet-switch devnet-switch--round"></span>';
+        echo '</label>';
+    }
+
+    /**
+     * Select for a `toggle` arg with `options` (`name`, `label`, `options`, `default`): a choice instead of on/off.
+     * Its '' option is off.
+     */
+    private function toggle_select($section, $toggle, $disabled = '')
+    {
+        $name  = $toggle['name'];
+        $value = $this->get_option($name, $section, $toggle['default'] ?? '');
+
+        printf(
+            '<select name="%1$s[%2$s]" aria-label="%3$s" %4$s>',
+            esc_attr($section),
+            esc_attr($name),
+            esc_attr($toggle['label'] ?? ''),
+            esc_attr($disabled)
+        );
+
+        foreach ($toggle['options'] as $key => $label) {
+            printf('<option value="%s" %s>%s</option>', esc_attr($key), selected($value, $key, false), esc_html($label));
+        }
+
+        echo '</select>';
     }
 
     /**
@@ -317,7 +404,13 @@ class Settings_API
         $max          = empty($args['max']) ? '' : $args['max'];
         $step         = empty($args['step']) ? '' : $args['step'];
         $has_unit_box = !empty($args['unit']) ? 'has-unit-box' : '';
+        $toggle       = $args['toggle'] ?? [];
 
+        // A switch in the same row, before the input, as callback_text().
+        if ($toggle) {
+            echo '<div class="devnet-toggle-field">';
+            $this->toggle_switch($args['section'], $toggle);
+        }
 
         printf(
             '<input type="%1$s" class="%2$s-number %10$s" id="%3$s[%4$s]" name="%3$s[%4$s]" value="%5$s" placeholder="%6$s" min="%7$s" max="%8$s" step="%9$s" />',
@@ -336,6 +429,10 @@ class Settings_API
 
         if ($has_unit_box) {
             echo '<div class="input-unit-box">' . esc_html($args['unit']) . '</div>';
+        }
+
+        if ($toggle) {
+            echo '</div>';
         }
 
         printf('<p class="description">%s</p>', wp_kses($args['desc'], $this->kses_args()));
@@ -544,17 +641,12 @@ class Settings_API
         $size                = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $multiple            = isset($args['multiple']) && $args['multiple'] ? 'multiple' : '';
         $disabled            = isset($args['disabled']) && $args['disabled'] == true ? 'disabled' : '';
-        $group_index         = $args['group_index'] ?? null;
         $multiple_collection = $multiple ? '[]' : '';
 
         $options = [];
 
         if ($value) {
             $options = is_array($value) ? $value : [$value];
-        }
-
-        if ($group_index !== null) {
-            $options = $args['std'];
         }
 
         printf(
@@ -592,11 +684,18 @@ class Settings_API
         $size        = isset($args['size']) && !is_null($args['size']) ? $args['size'] : 'regular';
         $rows        = isset($args['rows']) && !empty($args['rows']) ? $args['rows'] : 5;
         $cols        = isset($args['cols']) && !empty($args['cols']) ? $args['cols'] : 55;
-        $placeholder = empty($args['placeholder']) ? '' : ' placeholder="' . $args['placeholder'] . '"';
+        $placeholder = empty($args['placeholder']) ? '' : $args['placeholder'];
         $disabled    = isset($args['disabled']) && $args['disabled'] == true ? 'disabled' : '';
 
+        $toggle = $args['toggle'] ?? [];
+
+        if ($toggle) {
+            echo '<div class="devnet-toggle-field">';
+            $this->toggle_switch($args['section'], $toggle, $disabled);
+        }
+
         printf(
-            '<textarea rows="%1$s" cols="%2$s" class="%3$s-text" id="%4$s[%5$s]" name="%4$s[%5$s]"%6$s %7$s>%8$s</textarea>',
+            '<textarea rows="%1$s" cols="%2$s" class="%3$s-text" id="%4$s[%5$s]" name="%4$s[%5$s]" placeholder="%6$s" %7$s>%8$s</textarea>',
             esc_attr($rows),
             esc_attr($cols),
             esc_attr($size),
@@ -606,6 +705,10 @@ class Settings_API
             esc_attr($disabled),
             esc_textarea($value)
         );
+
+        if ($toggle) {
+            echo '</div>';
+        }
 
         printf('<p class="description">%s</p>', wp_kses($args['desc'], $this->kses_args()));
     }
@@ -671,12 +774,13 @@ class Settings_API
         );
         echo '<input type="button" class="button dvnt-f-browse" value="' . esc_attr($label) . '" />';
 
-        // to check if is an image.  
+        // Image by file extension, without requesting the URL: a slow or unreachable host would block this page.
         if ($value && filter_var($value, FILTER_VALIDATE_URL) && strpos($value, 'http') === 0) {
-            $maybe_image = @getimagesize($value);
-            if ($maybe_image && strpos($maybe_image['mime'], 'image/') === 0) {
+            $filetype = wp_check_filetype((string) wp_parse_url($value, PHP_URL_PATH));
+
+            if (strpos((string) $filetype['type'], 'image/') === 0) {
                 // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Using external image URL.
-                echo '<img src="' . esc_attr($value) . '" class="dvnt-f-preview" width="75" height="75"/>';
+                echo '<img src="' . esc_url($value) . '" class="dvnt-f-preview" width="75" height="75"/>';
             }
         }
 
@@ -763,8 +867,8 @@ class Settings_API
                  * to simplify life, we are building id upon callback functions structure.
                  * name attributes are build like: name="section[id]"
                  * that's why we have closing "]" first and no closing "]" at the end.
-                 * $external id will be inserted on the place of $id in the callback function inside "[]" 
-                 * 
+                 * $external id will be inserted on the place of $id in the callback function inside "[]"
+                 *
                  */
                 $extended_id = $args['id'] . ']' . $repeatable_index . '[' . $field['name'];
 
@@ -807,6 +911,27 @@ class Settings_API
 
         printf('<p class="description">%s</p>', wp_kses($args['desc'], $this->kses_args()));
     }
+
+    /**
+     * Displays a date picker for a settings field
+     *
+     * @param array   $args settings field args
+     */
+    public function callback_date($args)
+    {
+        $value = $this->get_option($args['id'], $args['section'], $args['std']);
+
+        printf(
+            '<input type="date" class="date" id="dvnt-%1$s[%2$s]" name="%1$s[%2$s]" value="%3$s" />',
+            esc_attr($args['section']),
+            esc_attr($args['id']),
+            esc_attr($value),
+        );
+
+        printf('<p class="description">%s</p>', wp_kses($args['desc'], $this->kses_args()));
+    }
+
+
 
 
     /**
@@ -993,7 +1118,9 @@ class Settings_API
 
             $this->inner_navigation($form);
 
-            if ($has_tabs) {
+            if (!empty($form['render'])) {
+                call_user_func($form['render'], $form);
+            } elseif ($has_tabs) {
                 $this->render_inner_tabs($form['id']); // Call function to render inner tabs
             } else {
                 $this->render_form($form);
@@ -1023,27 +1150,159 @@ class Settings_API
     }
 
     /**
+     * "Settings saved." or a field's error from the last save (options.php records them, get_settings_errors()),
+     * beside the Save button. Not notices: WordPress would move them to the top of the page.
+     *
+     * @since	4.0.0
+     */
+    private function save_messages()
+    {
+        $messages = '';
+
+        foreach (get_settings_errors() as $error) {
+            $type = in_array($error['type'], ['error', 'warning', 'info'], true) ? $error['type'] : 'success';
+            $icon = ['success' => 'yes-alt', 'info' => 'info-outline'][$type] ?? 'warning';
+
+            $messages .= sprintf(
+                '<p class="devnet-plugin-save-message devnet-plugin-save-message--%1$s"><span class="dashicons dashicons-%2$s" aria-hidden="true"></span> %3$s</p>',
+                esc_attr($type),
+                esc_attr($icon),
+                wp_kses_post($error['message'])
+            );
+        }
+
+        if ($messages) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped as it's built above.
+            echo '<div class="devnet-plugin-save-messages" role="status">' . $messages . '</div>';
+        }
+    }
+
+    /**
      * Function to render the settings form.
      */
     private function render_form($form)
     {
-        echo '<form method="post" action="options.php">';
+        $has_layout = !empty($form['layout']);
+
+        echo '<form method="post" action="options.php"' . ($has_layout ? ' class="dvnt-layout-form"' : '') . '>';
 
         do_action($this->plugin_slug . '_form_top', $form);
         do_action($this->plugin_slug . '_form_top_' . $form['id'], $form);
 
         settings_fields($form['id']);
-        do_settings_sections($form['id']);
+
+        if ($has_layout) {
+            $this->render_layout($form);
+        } else {
+            do_settings_sections($form['id']);
+        }
 
         do_action($this->plugin_slug . '_form_bottom_' . $form['id'], $form);
         do_action($this->plugin_slug . '_form_bottom', $form);
 
         if (isset($this->settings_fields[$form['id']])) {
             echo '<div class="submit-row" style="padding-left: 10px">';
+            $this->save_messages();
             submit_button();
             echo '</div>';
         }
 
         echo '</form>';
+
+        // Outside the options.php form: an HTML <form> cannot nest inside another, so any field
+        // needing its own <form> (e.g. an admin-post.php action button) must hook in here instead.
+        do_action($this->plugin_slug . '_form_after_' . $form['id'], $form);
+    }
+
+    /**
+     * Render a section's fields as a header plus panels (tabs on wide screens, a select on narrow ones).
+     * All panels stay inside the one options.php form, so they save together.
+     */
+    private function render_layout($form)
+    {
+        global $wp_settings_fields;
+
+        $id     = $form['id'];
+        $fields = $wp_settings_fields[$id] ?? [];
+
+        // Skip empty groups/panels, e.g. Popup when the module is unavailable.
+        $panels = [];
+        foreach ($form['layout'] as $key => $panel) {
+            $panel['groups'] = array_filter($panel['groups'], function ($group_id) use ($fields, $id) {
+                return !empty($fields["{$id}__{$group_id}"]);
+            }, ARRAY_FILTER_USE_KEY);
+
+            if ($panel['groups'] || (!$panels && !empty($fields[$id]))) {
+                $panels[$key] = $panel;
+            }
+        }
+
+        echo '<div class="dvnt-form-header">';
+        echo '<h2 class="dvnt-form-title">' . esc_html($form['title']) . '</h2>';
+
+        if (!empty($fields["{$id}__header"])) {
+            echo '<table class="form-table dvnt-form-header__fields" role="presentation">';
+            do_settings_fields($id, "{$id}__header");
+            echo '</table>';
+        }
+
+        do_action($this->plugin_slug . '_form_header', $form);
+        echo '</div>';
+
+        printf('<div class="dvnt-sections" data-section-id="%s">', esc_attr($id));
+
+        printf('<div class="dvnt-sections__tabs" role="tablist" aria-orientation="vertical" aria-label="%s">', esc_attr__('Settings sections', 'easy-subscribe'));
+        foreach ($panels as $key => $panel) {
+            $first = $key === array_key_first($panels);
+            printf(
+                '<button type="button" role="tab" id="dvnt-tab-%1$s-%2$s" aria-controls="dvnt-panel-%1$s-%2$s" aria-selected="%3$s" tabindex="%4$s" data-section="%2$s">%5$s</button>',
+                esc_attr($id),
+                esc_attr($key),
+                $first ? 'true' : 'false',
+                $first ? '0' : '-1',
+                esc_html($panel['title'])
+            );
+        }
+        echo '</div>';
+
+        // Narrow screens: CSS shows this instead of the tablist (never both).
+        printf('<div class="dvnt-sections__select"><label for="dvnt-section-select-%1$s">%2$s</label><select id="dvnt-section-select-%1$s">', esc_attr($id), esc_html__('Settings section', 'easy-subscribe'));
+        foreach ($panels as $key => $panel) {
+            printf('<option value="%s">%s</option>', esc_attr($key), esc_html($panel['title']));
+        }
+        echo '</select></div>';
+
+        foreach ($panels as $key => $panel) {
+            $first = $key === array_key_first($panels);
+
+            printf(
+                '<div class="dvnt-section-panel" role="tabpanel" id="dvnt-panel-%1$s-%2$s" aria-labelledby="dvnt-tab-%1$s-%2$s" data-section="%2$s"%3$s>',
+                esc_attr($id),
+                esc_attr($key),
+                $first ? '' : ' hidden'
+            );
+            echo '<h3 class="dvnt-section-title">' . esc_html($panel['title']) . '</h3>';
+
+            foreach ($panel['groups'] as $group_id => $group) {
+                printf('<div class="dvnt-settings-group dvnt-settings-group--%s"><div class="dvnt-settings-group__head"><h4 class="dvnt-settings-group__title">%s</h4>', esc_attr($group_id), esc_html($group['title']));
+                if (!empty($group['description'])) {
+                    echo '<p class="description">' . esc_html($group['description']) . '</p>';
+                }
+                echo '</div><table class="form-table" role="presentation">';
+                do_settings_fields($id, "{$id}__{$group_id}");
+                echo '</table></div>';
+            }
+
+            // Ungrouped fields (e.g. added by a filter) still render, and therefore still save.
+            if ($first && !empty($fields[$id])) {
+                echo '<div class="dvnt-settings-group"><table class="form-table" role="presentation">';
+                do_settings_fields($id, $id);
+                echo '</table></div>';
+            }
+
+            echo '</div>';
+        }
+
+        echo '</div>';
     }
 }

@@ -8,14 +8,26 @@ if (!defined('ABSPATH')) {
 
 class Defaults
 {
+    /**
+     * Visitor-facing texts: a saved empty value means "use the translated default",
+     * resolved at runtime in Helper::get_all_options(); any other value is a custom override.
+     */
+    const TEXT_FIELDS = [
+        'name_field_label',
+        'last_name_field_label',
+        'gdpr_text',
+        'email_field_label',
+        'button_label',
+        'success',
+        'exists',
+        'error',
+        'spam',
+        'pending_confirmation',
+    ];
 
     public static function general($option_name = '')
     {
-        $options = [
-            'multilingual'       => 0,
-            'delete_old_data'    => '',
-            'delete_plugin_data' => 0
-        ];
+        $options = [];
 
         $output = $options;
 
@@ -32,7 +44,6 @@ class Defaults
             'enable_form'           => 0,
             'only_logged_in'        => 0,
             'list'                  => 'subscribers',
-            'honeypot'              => 1,
             'confirmation'          => 'message',
             'confirmation_url'      => '',
             'auto_position_posts'   => '',
@@ -52,6 +63,7 @@ class Defaults
             'layout'                => 'inline',
             'style'                 => '',
             'field_size'            => 'medium',
+            'field_icons'           => 0,
             'primary_color'         => '#673ab7',
             'lighten_fields'        => 0,
             'field_bg_color'        => '',
@@ -67,6 +79,8 @@ class Defaults
             'content_before_form'   => '',
             'custom_css'            => ''
         ];
+
+        $options += self::messages();
 
         $output = $options;
 

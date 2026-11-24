@@ -23,6 +23,7 @@ class EasySubscribe_Admin {
         add_filter( 'plugin_action_links_' . DEVNET_ESUB_SLUG, [$this, 'plugin_action_links'] );
         add_action( 'wp_ajax_esub_repair_tables', [$this, 'repair_tables'] );
         add_action( 'rest_api_init', [$this, 'easy_subscribe_endpoint'] );
+        new Upsell();
         if ( $page === 'easy-subscribe' || $page === 'easy-subscribe-subscribers' ) {
             add_filter( 'admin_footer_text', [$this, 'admin_credits'] );
         }
@@ -41,11 +42,14 @@ class EasySubscribe_Admin {
             $load = true;
         }
         if ( $load ) {
+            // The file time, not the plugin version, so browsers fetch the stylesheet again after every build.
+            $css = plugin_dir_path( __DIR__ ) . 'assets/build/admin' . $sufix . '.css';
+            $version = ( file_exists( $css ) ? (string) filemtime( $css ) : $this->version );
             wp_enqueue_style(
                 $this->plugin_name . $sufix,
                 plugin_dir_url( __DIR__ ) . 'assets/build/admin' . $sufix . '.css',
                 [],
-                $this->version,
+                $version,
                 'all'
             );
         }
@@ -106,21 +110,18 @@ class EasySubscribe_Admin {
                 'preview' => true,
             ];
             $preview_script_data = apply_filters( 'esub_preview_script_data', $preview_script_data );
-            /* translators: %1$s: number of deleted entries */
-            $text_delete_success = __( '%s old entries has been successfully deleted.', 'easy-subscribe' );
             $script_data = [
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
                 'nonce'   => wp_create_nonce( 'easy-subscribe-nonce' ),
                 'text'    => [
-                    '30_days'        => esc_html__( '30 days', 'easy-subscribe' ),
-                    '3_months'       => esc_html__( '3 months', 'easy-subscribe' ),
-                    '6_months'       => esc_html__( '6 months', 'easy-subscribe' ),
-                    '12_months'      => esc_html__( '12 months', 'easy-subscribe' ),
-                    'delete_confirm' => esc_html__( 'Are you sure you want to proceed? This action will irreversibly delete old data.', 'easy-subscribe' ),
-                    'delete_success' => $text_delete_success,
-                    'delete_none'    => esc_html__( 'No old data was found or deleted.', 'easy-subscribe' ),
+                    'add_form'       => esc_html__( 'Add form', 'easy-subscribe' ),
+                    'delete_form'    => esc_html__( 'Delete form', 'easy-subscribe' ),
+                    'duplicate_form' => esc_html__( 'Duplicate form', 'easy-subscribe' ),
+                    'copied'         => esc_html__( 'Copied', 'easy-subscribe' ),
+                    'copy_manual'    => esc_html__( 'Press Ctrl+C (Cmd+C on Mac) to copy', 'easy-subscribe' ),
                 ],
                 'options' => $all_options,
+                'forms'   => array_keys( DEVNET_ESUB_OPTIONS['forms'] ),
             ];
             $script_data = apply_filters(
                 'esub_script_data',
@@ -134,17 +135,24 @@ class EasySubscribe_Admin {
             $load = true;
             $localized_obj_name = 'devnet_esub_subscribers_script';
             $sufix = '-subscribers';
+            // Outside the array: Freemius' Free build drops comments inside array literals.
+            /* translators: %s: number of deleted entries */
+            $delete_success = __( '%s old entries has been successfully deleted.', 'easy-subscribe' );
             $script_data = [
                 'ajaxurl'            => admin_url( 'admin-ajax.php' ),
                 'nonce'              => wp_create_nonce( 'wp_rest' ),
                 'text'               => [
                     'select_csv_fields' => esc_html__( 'Please select at least one field.', 'easy-subscribe' ),
+                    'delete_confirm'    => esc_html__( 'Are you sure you want to proceed? This action will irreversibly delete old data.', 'easy-subscribe' ),
+                    'delete_success'    => $delete_success,
+                    'delete_none'       => esc_html__( 'No old data was found or deleted.', 'easy-subscribe' ),
                 ],
+                'csv_filename'       => sanitize_file_name( wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) . '-subscribers.csv' ),
                 'additional_columns' => apply_filters( 'esub_table_additional_columns', [] ),
             ];
         }
         if ( $load ) {
-            $script_asset_path = plugin_dir_url( __DIR__ ) . 'assets/build/admin' . $sufix . '.asset.php';
+            $script_asset_path = plugin_dir_path( __DIR__ ) . 'assets/build/admin' . $sufix . '.asset.php';
             $script_info = ( file_exists( $script_asset_path ) ? include $script_asset_path : [
                 'dependencies' => ['jquery', 'wp-element'],
                 'version'      => $this->version,
@@ -152,7 +160,7 @@ class EasySubscribe_Admin {
             wp_enqueue_script(
                 $this->plugin_name,
                 plugin_dir_url( __DIR__ ) . 'assets/build/admin' . $sufix . '.js',
-                $script_info['dependencies'],
+                array_unique( array_merge( ['jquery'], $script_info['dependencies'] ) ),
                 $script_info['version'],
                 true
             );
@@ -293,6 +301,24 @@ class EasySubscribe_Admin {
      *
      */
     public function post_esub_data_callback( $request ) {
+        // Honeypot: the form sends `subject` empty; filled means a bot, nothing is stored. A missing field is
+        // allowed: forms before 2.0.0 don't send it, and cached pages or scripts can still be on that version.
+        $subject = $request->get_param( 'subject' );
+        if ( $subject !== null && $subject !== '' ) {
+            return rest_ensure_response( [
+                'id'                   => null,
+                'response'             => 'spam',
+                'pending_confirmation' => false,
+            ] );
+        }
+        // sanitize_email() turns an invalid address into ''.
+        if ( !is_email( $request->get_param( 'email' ) ) ) {
+            return rest_ensure_response( [
+                'id'                   => null,
+                'response'             => 'error',
+                'pending_confirmation' => false,
+            ] );
+        }
         $args = [
             'name'          => $request->get_param( 'name' ),
             'last_name'     => $request->get_param( 'last_name' ),
@@ -386,6 +412,11 @@ class EasySubscribe_Admin {
                 'form_id'       => [
                     'type'              => 'string',
                     'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => 'rest_validate_request_arg',
+                    'required'          => false,
+                ],
+                'subject'       => [
+                    'type'              => 'string',
                     'validate_callback' => 'rest_validate_request_arg',
                     'required'          => false,
                 ],

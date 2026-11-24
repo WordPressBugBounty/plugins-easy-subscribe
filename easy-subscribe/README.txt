@@ -3,8 +3,8 @@ Contributors: devnethr, MarinMatosevic
 Tags: newsletter, subscribe, email list, lead generation, subscribers
 Requires PHP: 7.4
 Requires at least: 6.4
-Stable tag: 1.5.7
-Tested up to: 7.0
+Stable tag: 2.0.0
+Tested up to: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,7 +17,7 @@ Collect leads and grow your email list directly inside WordPress with customizab
 Add customizable subscription forms anywhere using a simple shortcode and manage subscribers from your WordPress dashboard. No external services, API keys, or complicated integrations required.
 
 
-### [DOCUMENTATION](https://devnet.hr/docs/easy-subscribe/) | [EASY SUBSCRIBE PRO](https://devnet.hr/plugins/easy-subscribe/) | [WooCommerce Add-On](https://devnet.hr/plugins/easy-subscribe/#woocommerce-add-on)
+### [DOCUMENTATION](https://devnet.hr/docs/easy-subscribe/) | [EASY SUBSCRIBE PRO](https://devnet.hr/plugins/easy-subscribe/)
 
 ## Why Easy Subscribe?
 
@@ -51,39 +51,30 @@ Download subscribers as a CSV file and import them into your preferred email mar
 
 Unlock advanced lead generation and subscriber management features with Easy Subscribe Pro.
 
-* Multiple forms
+* Popup forms with six ready-made designs, opened after a delay or from any button or link
+* Choose where and how often popups open
+* Multiple forms, and duplicate a form in one click
 * Multiple subscription lists
 * Last name field
+* Icons in form fields
 * Confirmation - redirect to URL
 * Option to show only to logged-in users
 * Double Opt-In
 * More design options
-* Custom CSS
 * Customizable CSV output
 * Delete subscribers
 * Priority support
 
-## WooCommerce Add-on
+## Ecommerce plan: WooCommerce
 
-🎉 **Turn Product Pages into Lead Generators!**
-The [Easy Subscribe – WooCommerce Add-On](https://devnet.hr/plugins/easy-subscribe/#woocommerce-add-on) lets you place a sleek, customizable subscription form directly on product pages. Capture leads at the moment of interest and grow targeted subscriber lists based on customer preferences. Enable the form globally or manage it per product for maximum flexibility.  
+The Ecommerce plan adds WooCommerce to Easy Subscribe, with everything in PRO:
 
-💡 **Bonus:** Automatically subscribe customers when they place an order, ensuring every purchase helps expand your email list.  
+* Subscribe forms on product pages, inline or in a popup, with per-product Show/Hide
+* Add customers to a list automatically when they order
+* Import email addresses from past orders
+* Marketing consent checkbox on the classic checkout (Checkout Blocks are not supported yet)
 
-Start building a more engaged audience!  
-[Learn more about it here.](https://devnet.hr/plugins/easy-subscribe/#woocommerce-add-on)
-
-
-- **Product**
-    - Customizable subscription form displayed on product pages  
-    - Automatically placed in predefined positions or manually added via shortcode  
-    - Option to enable or disable the form globally or per product  
-
-- **Orders**
-    - Auto-subscribe users on order creation/completion  
-    - Migration of billing emails from existing orders to subscription list  
-
-
+Moving from the WooCommerce add-on? Your settings, lists, product settings and order consent are kept. While the add-on is active, it keeps handling your store. After verifying your Ecommerce license, deactivate (do not uninstall) the add-on to use the built-in module.
 
 ## Usage
 
@@ -112,7 +103,7 @@ Here are some other plugins we have developed that you might find useful:
     - [FSL Discount Add-On](https://devnet.hr/plugins/free-shipping-label/fsl-discount) - By setting customizable thresholds for single, double, or triple-step discounts, you’ll motivate shoppers to add more to their carts.
 - [Product Price History](https://wordpress.org/plugins/product-price-history/) - Track product price history with customizable charts and graphs on your WooCommerce store. Show lowest price and increase customer trust.
 - [Easy Subscribe](https://wordpress.org/plugins/easy-subscribe/) - Effortlessly integrate customizable subscription forms on your WordPress site with a simple shortcode.
-    - [Easy Subscribe – WooCommerce Add-On](https://devnet.hr/plugins/easy-subscribe/#woocommerce-add-on) lets you place a subscription form directly on product pages to capture leads at the moment of interest and grow targeted subscriber lists based on customer preferences.
+    - The Ecommerce plan includes WooCommerce product forms, order subscriptions, imports and classic checkout consent.
 - [Easy Booking Calendar](https://wordpress.org/plugins/easy-booking-calendar/) - Turn any product into a reservation-ready item. This plugin adds a customizable calendar to product pages, allowing customers to select date ranges for bookings.
 - [BizNotes](https://wordpress.org/plugins/biznotes/) - Exclusive admin notes for seamless order management among multiple admins. Effortless collaboration, powered up.
 - [Snap Blocks](https://wordpress.org/plugins/snap-blocks/) - A lightweight plugin that lets you create reusable content blocks in WordPress.
@@ -132,6 +123,12 @@ This plugin can be easily installed like any other WordPress integration by foll
 
 == Frequently Asked Questions ==
 
+= How do I show a form in a popup? =
+
+On Pro, open the form's Popup section and turn on Show in a popup. Pick a design, then choose when it opens: automatically after a delay, or only when a visitor clicks a button.
+
+To open it from a button, image, text link or menu item, set the link to the popup's address shown under Button link (for example `#easy-subscribe`). Popup designs apply only to the popup; the form on your pages keeps its own style.
+
 = Does Easy Subscribe send newsletters? =
 
 No. Easy Subscribe is designed for collecting and managing subscribers inside WordPress. You can export subscribers as a CSV file and import them into your preferred email marketing platform whenever needed.
@@ -143,6 +140,12 @@ No. Easy Subscribe works entirely inside WordPress and does not require any exte
 = Where are subscribers stored? =
 
 Subscribers are stored in your WordPress database and can be managed directly from the WordPress admin area.
+
+= Is my data deleted when I uninstall the plugin? =
+
+No. Subscribers and settings are kept by default. To remove all Easy Subscribe data on uninstall, add this to your theme's functions.php (or a code snippet plugin) before deleting the plugin:
+
+`add_filter( 'esub_delete_plugin_data', '__return_true' );`
 
 = Can I export subscribers? =
 
@@ -156,6 +159,18 @@ Simply place the `[easy-subscribe]` shortcode anywhere on your website. The form
 
 Yes. Easy Subscribe includes multiple form styles and design settings that allow you to customize colors, layouts, spacing, typography, and other visual elements to match your website.
 
+= Can I style the form with my own CSS? =
+
+Yes, from your theme, child theme or Appearance → Customize → Additional CSS. The form is isolated from theme styles, so target its parts with `::part()`:
+
+`.easy-subscribe .esub-form::part(button) { background: #222; border-radius: 0; }`
+`.easy-subscribe .esub-form::part(button):hover { background: #444; }`
+`.easy-subscribe .esub-form::part(outline) { border-color: #222; }`
+
+Available parts: `form`, `field` (plus `field-name`, `field-last-name`, `field-email`), `label`, `control` (field background; underline via `::before`/`::after`), `outline` (border of the Outlined style), `input`, `icon` (when Icons in fields is on), `button`, `consent`, `consent-checkbox`, `consent-text`, `message` (plus `message-success`, `message-warning`, `message-error`) and `spinner`.
+
+To style one form only, use the wrapper class from its shortcode ID: `[easy-subscribe id="abc"]` renders in `.easy-subscribe-abc`, e.g. `.easy-subscribe-abc .esub-form::part(input)`. Text before the form is regular HTML inside `.esub-before-form`.
+
 = Is Easy Subscribe GDPR-friendly? =
 
 Yes. Easy Subscribe includes optional GDPR consent checkboxes. Easy Subscribe Pro also includes Double Opt-In functionality for additional compliance and subscriber verification.
@@ -166,7 +181,11 @@ Multiple forms and subscription lists are available in Easy Subscribe Pro.
 
 = Does Easy Subscribe work with WooCommerce? =
 
-Yes. The optional WooCommerce Add-On allows you to display subscription forms on product pages and automatically subscribe customers based on their orders.
+Yes. The Ecommerce plan includes product subscription forms, order subscriptions, historical imports and classic checkout marketing consent.
+
+= Can I translate the form? =
+
+Yes. Leave a text empty to use the default, translated into your site language. With WPML, texts you write yourself (field labels, messages, the text above the form and the popup text) can be translated in WPML → String Translation.
 
 = Can I import existing subscribers? =
 
@@ -182,6 +201,31 @@ Currently, Easy Subscribe focuses on collecting and exporting subscribers. Subsc
 6. Settings page
 
 == Changelog ==
+
+= 2.0.0 =
+
+*2026-11-24*
+
+* Fix: Form not showing with block themes
+* Fix: Form not showing on WordPress 6.4 and 6.5
+
+
+* Add: WPML support for form texts
+* Add: Style forms from your theme CSS with `::part()` (see FAQ)
+
+
+* Update: Redesigned form settings
+* Update: Multilingual setting removed, empty texts show translated defaults
+* Update: Spam protection always on, setting removed
+* Update: Custom CSS setting deprecated, saved CSS keeps working
+* Update: Plugin data is kept on uninstall by default
+* Update: Freemius SDK updated to the latest version
+
+
+* Security: Spam check also runs on the server
+
+
+* Dev: New filter `esub_delete_plugin_data`
 
 = 1.5.7 =
 

@@ -13,7 +13,7 @@ class Notifier
 
     public function __construct() {}
 
-    public static function send_confirmation_email($email, $token, $redirect_url = '')
+    public static function send_confirmation_email($email, $token, $redirect_url = '', $form_id = '')
     {
         if (!$token || empty($email)) {
             return;
@@ -38,6 +38,7 @@ class Notifier
         // Generate confirmation URL (redirects back to the subscribing page)
         $verification_link = add_query_arg([
             'esub_confirm' => $token,
+            'esub_form'    => $form_id,
             'email'      => urlencode($email),
         ], esc_url($redirect_url));
 

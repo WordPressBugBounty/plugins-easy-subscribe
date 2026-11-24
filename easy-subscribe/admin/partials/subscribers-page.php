@@ -116,5 +116,34 @@ esc_html_e( 'Download CSV', 'easy-subscribe' );
 esc_html_e( 'Delete selected', 'easy-subscribe' );
 ?></button>
 
+    <div class="esub-subscribers-delete-old <?php 
+echo esc_attr( $esub_class );
+?>">
+        <label for="esub-delete-old-data"><?php 
+esc_html_e( 'Delete entries older than', 'easy-subscribe' );
+?></label>
+        <select id="esub-delete-old-data">
+            <option value=""><?php 
+esc_html_e( '-- Select --', 'easy-subscribe' );
+?></option>
+            <option value="30_days"><?php 
+esc_html_e( '30 days', 'easy-subscribe' );
+?></option>
+            <option value="3_months"><?php 
+esc_html_e( '3 months', 'easy-subscribe' );
+?></option>
+            <option value="6_months"><?php 
+esc_html_e( '6 months', 'easy-subscribe' );
+?></option>
+            <option value="12_months"><?php 
+esc_html_e( '12 months', 'easy-subscribe' );
+?></option>
+        </select>
+        <button id="esub-delete-old-data-button" class="esub-button" disabled><?php 
+esc_html_e( 'Delete now', 'easy-subscribe' );
+?></button>
+        <span class="esub-delete-old-data-status" role="status"></span>
+    </div>
+
 
 </div>

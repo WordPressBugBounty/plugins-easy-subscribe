@@ -30,6 +30,7 @@ class Plugin {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/settings-api.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/settings.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/upsell.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
     }
 
